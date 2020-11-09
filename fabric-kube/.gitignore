@@ -1,6 +1,0 @@
-crypto-config/
-channel-artifacts/
-wtf.yaml
-tmp/*
-**/hostAliases.yaml
-**/externalHostAliases.yaml

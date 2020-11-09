@@ -18,14 +18,14 @@ In [configtx.yaml](fabric-kube/samples/scaled-raft-no-tls/configtx.yaml#L270-L28
 - Host: orderer0.groeifabriek.nl
   Port: 7059
 ```
-Raft orderers mutually authenticate each other so they always need TLS for inter-orderer communication. That's why disabling TLS globally requires Raft orderers communicate each other over another port instead of client-facing orderer port (7050). We enable this behavior by passing the argument `orderer.cluster.enabled=true` to hlf-kube chart. 
+Raft orderers mutually authenticate each other so they always need TLS for inter-orderer communication. That's why disabling TLS globally requires Raft orderers communicate each other over another port instead of client-facing orderer port (7050). We enable this behavior by passing the argument `orderer.cluster.enabled=true` to diamond-kube chart. 
 
 No other change is required. Any client of orderer, either application or Argo flows or whatever, will still use the client-facing port (7050)
 
 Let's launch the Raft network without TLS. First tear down everything as usual:
 ```
 argo delete --all
-helm delete hlf-kube --purge
+helm delete diamond-kube --purge
 ```
 Wait a bit until all pods are terminated, then create necessary stuff:
 ```
@@ -34,7 +34,7 @@ Wait a bit until all pods are terminated, then create necessary stuff:
 
 Luanch the Raft based Fabric network in broken state (only because of `useActualDomains=true`)
 ```
-helm install ./hlf-kube --name hlf-kube -f samples/scaled-raft-no-tls/network.yaml -f samples/scaled-raft-no-tls/crypto-config.yaml --set orderer.cluster.enabled=true --set peer.launchPods=false --set orderer.launchPods=false
+helm install ./diamond-kube --name diamond-kube -f samples/scaled-raft-no-tls/network.yaml -f samples/scaled-raft-no-tls/crypto-config.yaml --set orderer.cluster.enabled=true --set peer.launchPods=false --set orderer.launchPods=false
 ```
 
 Collect the host aliases:
@@ -44,7 +44,7 @@ Collect the host aliases:
  
 Then update the network with host aliases:
 ``` 
-helm upgrade hlf-kube ./hlf-kube -f samples/scaled-raft-no-tls/network.yaml -f samples/scaled-raft-no-tls/crypto-config.yaml -f samples/scaled-raft-no-tls/hostAliases.yaml --set orderer.cluster.enabled=true
+helm upgrade diamond-kube ./diamond-kube -f samples/scaled-raft-no-tls/network.yaml -f samples/scaled-raft-no-tls/crypto-config.yaml -f samples/scaled-raft-no-tls/hostAliases.yaml --set orderer.cluster.enabled=true
 ```
 Again lets wait for all pods are up and running:
 
