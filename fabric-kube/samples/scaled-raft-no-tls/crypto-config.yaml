@@ -1,0 +1,55 @@
+# ---------------------------------------------------------------------------
+# "OrdererOrgs" - Definition of organizations managing orderer nodes
+# ---------------------------------------------------------------------------
+OrdererOrgs:
+  # ---------------------------------------------------------------------------
+  # Orderer
+  # ---------------------------------------------------------------------------
+  - Name: Giggso
+    Domain: giggso.nl
+    EnableNodeOUs: true
+    Specs:
+      - Hostname: orderer0
+      - Hostname: orderer1
+      - Hostname: orderer2
+  # - Name: Pivt
+  #   Domain: pivt.nl
+  #   EnableNodeOUs: true
+  #   Specs:
+  #     - Hostname: orderer0
+      
+# ---------------------------------------------------------------------------
+# "PeerOrgs" - Definition of organizations managing peer nodes
+# ---------------------------------------------------------------------------
+PeerOrgs:
+  - Name: Diamond
+    Domain: diamond
+    EnableNodeOUs: true
+    Template:
+      Count: 2
+    Users:
+      Count: 1
+  
+  - Name: Tenderer
+    Domain: tenderer
+    EnableNodeOUs: true
+    Template:
+      Count: 2
+    Users:
+      Count: 1
+
+  - Name: Bidder
+    Domain: bidder
+    EnableNodeOUs: true
+    Template:
+      Count: 2
+    Users:
+      Count: 1
+
+  - Name: Printer
+    Domain: printer
+    EnableNodeOUs: true
+    Template:
+      Count: 2
+    Users:
+      Count: 1
