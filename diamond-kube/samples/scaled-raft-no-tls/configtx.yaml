@@ -11,10 +11,10 @@
 Organizations:
 
     - &Giggso
-        Name: GigsoMSP
+        Name: GiggsoMSP
 
         # ID to load the MSP definition as
-        ID: GigsoMSP
+        ID: GiggsoMSP
 
         # MSPDir is the filesystem path which contains the MSP configuration
         MSPDir: crypto-config/ordererOrganizations/giggso.nl/msp
@@ -25,13 +25,13 @@ Organizations:
         Policies:
             Readers:
                 Type: Signature
-                Rule: "OR('GigsoMSP.member')"
+                Rule: "OR('GiggsoMSP.member')"
             Writers:
                 Type: Signature
-                Rule: "OR('GigsoMSP.member')"
+                Rule: "OR('GiggsoMSP.member')"
             Admins:
                 Type: Signature
-                Rule: "OR('GigsoMSP.admin')"
+                Rule: "OR('GiggsoMSP.admin')"
 
     # - &Pivt
     #     Name: PivtMSP
@@ -138,6 +138,13 @@ Organizations:
             Admins:
                 Type: Signature
                 Rule: "OR('BidderMSP.admin')"
+
+        AnchorPeers:
+            # AnchorPeers defines the location of peers which can be used
+            # for cross org gossip communication.  Note, this value is only
+            # encoded in the genesis block in the Application section context
+            - Host: peer0.bidder
+              Port: 7051
     
     - &Printer
         # DefaultOrg defines the organization which is used in the sampleconfig
@@ -167,7 +174,7 @@ Organizations:
             # AnchorPeers defines the location of peers which can be used
             # for cross org gossip communication.  Note, this value is only
             # encoded in the genesis block in the Application section context
-            - Host: peer0.bidder
+            - Host: peer0.printer
               Port: 7051
 
 ################################################################################
@@ -437,11 +444,11 @@ Profiles:
                 - *Bidder
                 - *Printer
 
-    private-diamond-bidder:
-        Consortium: TheConsortium
-        <<: *ChannelDefaults
-        Application:
-            <<: *ApplicationDefaults
-            Organizations:
-                - *Diamond
-                - *Bidder
+    # private-diamond-bidder:
+    #     Consortium: TheConsortium
+    #     <<: *ChannelDefaults
+    #     Application:
+    #         <<: *ApplicationDefaults
+    #         Organizations:
+    #             - *Diamond
+    #             - *Bidder

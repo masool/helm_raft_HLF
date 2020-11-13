@@ -31,13 +31,13 @@ network:
         orgs: [Diamond, Tenderer, Bidder, Printer]
         policy: OR('DiamondMSP.member','TendererMSP.member','BidderMSP.member', 'PrinterMSP.member')
         
-    - name: even-simpler
-      # if defined, this will override the global chaincode.language value
-      language: golang
-      orgs: [Diamond, Bidder]
-      channels:
-      - name: private-diamond-bidder
-        orgs: [Diamond, Bidder]
-        policy: OR('DiamondMSP.member','BidderMSP.member')
+    # - name: even-simpler
+    #   # if defined, this will override the global chaincode.language value
+    #   language: golang
+    #   orgs: [Diamond, Bidder]
+    #   channels:
+    #   - name: private-diamond-bidder
+    #     orgs: [Diamond, Bidder]
+    #     policy: OR('DiamondMSP.member','BidderMSP.member')
 
 
