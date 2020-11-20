@@ -2,19 +2,19 @@
 {{- range $i, $org := $.Values.PeerOrgs }}
 {{- range $peerIndex := until ($org.Template.Count | int) }}
 {{- $peer := (printf "peer%s" ($peerIndex | toString)) }}
-{{- $peerAddress := $.Values.useActualDomains | ternary (printf "%s.%s:7051" $peer $org.Domain) (printf "hlf-peer--%s--%s:7051" ($org.Name | lower) ($peer | lower)) }}
+{{- $peerAddress := $.Values.useActualDomains | ternary (printf "%s.%s:7051" $peer $org.Domain) (printf "diamond-peer--%s--%s:7051" ($org.Name | lower) ($peer | lower)) }}
 # peerAddress: {{ $peerAddress }}
 
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: hlf-peer--{{ $org.Name | lower }}--{{ $peer | lower }}
+  name: diamond-peer--{{ $org.Name | lower }}--{{ $peer | lower }}
 spec:
   replicas: 1
-  serviceName: hlf-peer--{{ $org.Name | lower }}--{{ $peer | lower }}
+  serviceName: diamond-peer--{{ $org.Name | lower }}--{{ $peer | lower }}
   selector:
     matchLabels:
-      app: hlf-peer--{{ $org.Name | lower }}--{{ $peer | lower }}
+      app: diamond-peer--{{ $org.Name | lower }}--{{ $peer | lower }}
   volumeClaimTemplates:
   {{- if $.Values.peer.persistence.enabled }}
   - metadata:
@@ -26,17 +26,6 @@ spec:
       resources:
         requests:
           storage: {{ $.Values.peer.persistence.size }}
-  {{- end }}
-  {{- if $.Values.couchdb.persistence.enabled }}
-  - metadata:
-      name: couchdb-disk
-    spec:
-      accessModes:
-        - ReadWriteOnce
-      storageClassName: {{ $.Values.persistence.storageClass }}
-      resources:
-        requests:
-          storage: {{ $.Values.couchdb.persistence.size }}
   {{- end }}
   {{- if and $.Values.peer.docker.dind.enabled $.Values.peer.docker.dind.persistence.enabled }}
   - metadata:
@@ -52,17 +41,13 @@ spec:
   template:
     metadata:
       labels:
-        name: hlf-peer 
-        org: hlf-peer--{{ $org.Name | lower }}
-        app: hlf-peer--{{ $org.Name | lower }}--{{ $peer | lower }}
+        name: diamond-peer 
+        org: diamond-peer--{{ $org.Name | lower }}
+        app: diamond-peer--{{ $org.Name | lower }}--{{ $peer | lower }}
     spec:
       volumes:
       {{- if not $.Values.peer.persistence.enabled }}
       - name: peer-disk
-        emptyDir: {}
-      {{- end }}
-      {{- if not $.Values.couchdb.persistence.enabled }}
-      - name: couchdb-disk
         emptyDir: {}
       {{- end }}
       {{- if not $.Values.peer.docker.dind.enabled }}
@@ -81,10 +66,10 @@ spec:
       {{- end }}
       - name: peer-tls
         secret:
-          secretName: hlf-peer--{{ $org.Name | lower }}--{{ $peer | lower }}-tls
+          secretName: diamond-peer--{{ $org.Name | lower }}--{{ $peer | lower }}-tls
       - name: peer-msp
         secret:
-          secretName: hlf-peer--{{ $org.Name | lower }}--{{ $peer | lower }}-msp
+          secretName: diamond-peer--{{ $org.Name | lower }}--{{ $peer | lower }}-msp
           items:
           - key: config.yaml
             path: config.yaml
@@ -100,7 +85,7 @@ spec:
             path: admincerts/cert.pem
       - name: peer-admin-msp
         secret:
-          secretName: hlf-peer--{{ $org.Name | lower }}--admin-msp
+          secretName: diamond-peer--{{ $org.Name | lower }}--admin-msp
           items:
           - key: config.yaml
             path: config.yaml
@@ -118,7 +103,7 @@ spec:
       {{- range $i, $chaincode := $.Values.network.chaincodes }}    
       - name: chaincode-{{ $chaincode.name | lower }}
         configMap:
-          name: hlf-chaincode--{{ $chaincode.name | lower }}
+          name: diamond-chaincode--{{ $chaincode.name | lower }}
       {{- end }}
 
       {{- if $.Values.hostAliases }}
@@ -141,10 +126,6 @@ spec:
                                tar -czf /data/peer.tar -C /var/hyperledger/production ledgersData/ chaincodes/ && \
                                echo 'prepared peer data for backup' && \
           {{- end }}
-          {{- if $.Values.couchdb.backup.enabled }}
-                               tar -czf /data/couchdb.tar -C /opt/couchdb/data --exclude='lost+found' .  && \
-                               echo 'prepared CouchDB data for backup' && \
-          {{- end }}
                                touch /ready && \
                                /entrypoint.sh rsync_server"]
                                
@@ -155,8 +136,6 @@ spec:
         volumeMounts:
         - mountPath: /var/hyperledger/production/
           name: peer-disk
-        - mountPath: /opt/couchdb/data/
-          name: couchdb-disk
 
         env:
         - name: ALLOW
@@ -189,19 +168,12 @@ spec:
                                tar -xf /data/peer.tar -C /var/hyperledger/production/ && \
                                echo 'restored peer data from backup' && \
           {{- end }}
-          {{- if $.Values.couchdb.restore.enabled }}
-                               rm -rf /opt/couchdb/data/* && \
-                               tar -xf /data/couchdb.tar -C /opt/couchdb/data/ && \
-                               echo 'restored CouchDB data from backup' && \
-          {{- end }}
                                echo 'ready to continue..' && \
                                while true; do sleep 60; done"]
                                
         volumeMounts:
         - mountPath: /var/hyperledger/production/
           name: peer-disk
-        - mountPath: /opt/couchdb/data/
-          name: couchdb-disk
         - mountPath: /data/
           name: rsync-disk
 
@@ -226,7 +198,7 @@ spec:
                 {{- range $peerIndexInner := until ($org.Template.Count | int) }}
                 {{- if not (eq $peerIndex $peerIndexInner) }}
                 {{- $peerInner := (printf "peer%s" ($peerIndexInner | toString)) }}
-                - hlf-peer--{{ $org.Name | lower }}--{{ $peerInner | lower }}
+                - diamond-peer--{{ $org.Name | lower }}--{{ $peerInner | lower }}
                 {{- end }} {{- /* if not same peer */ -}}
                 {{- end }} {{- /* Peers */ -}}{{""}}
       {{- else }}
@@ -242,7 +214,7 @@ spec:
                   {{- range $peerIndexInner := until ($org.Template.Count | int) }}
                   {{- if not (eq $peerIndex $peerIndexInner) }}
                   {{- $peerInner := (printf "peer%s" ($peerIndexInner | toString)) }}
-                  - hlf-peer--{{ $org.Name | lower }}--{{ $peerInner | lower }}
+                  - diamond-peer--{{ $org.Name | lower }}--{{ $peerInner | lower }}
                   {{- end }} {{- /* if not same peer */ -}}
                   {{- end }} {{- /* Peers */ -}}{{""}}
       {{- end }}{{- /* if-else antiAffinity.strict */ -}}
@@ -270,7 +242,7 @@ spec:
         - mountPath: /etc/hyperledger/fabric/admin-msp/
           name: peer-admin-msp
         # - mountPath: /hl_config/channel/
-        #   name: hlf-channels
+        #   name: diamond-channels
         # chaincodes
         {{- range $i, $chaincode := $.Values.network.chaincodes }}    
         - mountPath: /chaincode/{{ $chaincode.name }}
@@ -291,7 +263,7 @@ spec:
           value: >- 
         {{- range $peerIndexInner := until ($org.Template.Count | int) }}
         {{- $peer := (printf "peer%s" ($peerIndexInner | toString)) }}
-        {{- $peerGossipAddress := $.Values.useActualDomains | ternary (printf "%s.%s:7051" $peer $org.Domain) (printf "hlf-peer--%s--%s:7051" ($org.Name | lower) ($peer | lower)) }}
+        {{- $peerGossipAddress := $.Values.useActualDomains | ternary (printf "%s.%s:7051" $peer $org.Domain) (printf "diamond-peer--%s--%s:7051" ($org.Name | lower) ($peer | lower)) }}
               {{ $peerGossipAddress }}
         {{- end }} {{- /* Peers */ -}}{{""}}
 
@@ -334,15 +306,6 @@ spec:
         - name: CORE_VM_DOCKER_ATTACHSTDOUT
           value: {{ $.Values.peer.chaincode.attachStdout | quote }} 
         
-        - name: CORE_LEDGER_STATE_STATEDATABASE
-          value: CouchDB
-        - name: CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS
-          value: localhost:5984
-        - name: CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME
-          value: {{ $.Values.couchdb.userName | quote }}
-        - name: CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD
-          value: {{ $.Values.couchdb.password | quote }}
-        
         - name: HFC_LOGGING
           value: '{"info":"console"}'
         - name: GRPC_VERBOSITY
@@ -365,20 +328,6 @@ spec:
         - name: CORE_METRICS_PROVIDER
           value: {{ $.Values.peer.metrics.provider }}
         {{- end }}
-
-      # CouchDB container
-      - name: couchdb
-        image: hyperledger/fabric-couchdb:{{ $.Values.couchdb.version }}
-
-        volumeMounts:
-        - mountPath: /opt/couchdb/data/
-          name: couchdb-disk
-        
-        env:
-        - name: COUCHDB_USER
-          value: {{ $.Values.couchdb.userName | quote }}
-        - name: COUCHDB_PASSWORD
-          value: {{ $.Values.couchdb.password | quote }}
 
       {{- if $.Values.peer.docker.dind.enabled }}
 

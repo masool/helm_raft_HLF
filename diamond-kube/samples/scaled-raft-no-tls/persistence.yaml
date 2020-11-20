@@ -5,7 +5,3 @@ peer:
 orderer:
   persistence:
     enabled: true
-
-couchdb:
-  persistence:
-    enabled: true

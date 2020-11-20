@@ -3,7 +3,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: hlf-chaincode--{{ $chaincode.name | lower }}
+  name: diamond-chaincode--{{ $chaincode.name | lower }}
   labels:
     chaincodeName: {{ $chaincode.name }}
     type: chaincode

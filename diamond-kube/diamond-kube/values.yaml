@@ -28,14 +28,6 @@ restore:
   # initiate restore procedure?
   enabled: false
 
-# common settings for CouchDB and CA ingresses
-ingress:
-  # all ingress subdomains will be created under this domain
-  parentDomain:
-  annotations:
-    kubernetes.io/ssl-redirect: "true"
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-
 # peer settings. applies to all peers
 peer:
   logLevel: info
@@ -63,7 +55,7 @@ peer:
     enabled: false
     annotations:
       # this should match the ingressClass when peer ingress controller is created
-      kubernetes.io/ingress.class: "hlf-peer"
+      kubernetes.io/ingress.class: "diamond-peer"
   externalService:
     # expose peers to outer world with LoadBalancer service type?
     enabled: false
@@ -89,23 +81,6 @@ peer:
   metrics:
     enabled: false
     provider: prometheus
-    
-# CouchDB settings. applies to all CouchDB's
-couchdb:
-  version: 0.4.15
-  userName: 
-  password:
-  persistence:
-    enabled: false
-    size: 16Gi
-  ingress:
-    enabled: false
-  backup: 
-    # take backup of CouchDB's during backup procedure?
-    enabled: true
-  restore: 
-    # restore CouchDB's data from backup during restore procedure?
-    enabled: true
 
 
 # Orderer settings. applies to all Orderer pods
@@ -129,7 +104,7 @@ orderer:
     enabled: false
     annotations:
       # this should match the ingressClass when orderer ingress controller is created
-      kubernetes.io/ingress.class: "hlf-orderer"
+      kubernetes.io/ingress.class: "diamond-orderer"
   externalService:
     # expose orderers to outer world with LoadBalancer service type?
     enabled: false
@@ -171,7 +146,7 @@ chaincode:
 
 
 # kafka settings
-hlf-kafka:
+diamond-kafka:
   # install kafka?
   enabled: false
 

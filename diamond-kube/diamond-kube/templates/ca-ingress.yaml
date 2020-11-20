@@ -2,7 +2,7 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: hlf-ca--ingress
+  name: diamond-ca--ingress
   annotations:
     {{- range $key, $value := .Values.ingress.annotations }}
       {{ $key }}: {{ $value | quote }}
@@ -10,18 +10,18 @@ metadata:
 spec:
   rules:
 {{- range $i, $org := .Values.PeerOrgs }}
-  - host: hlf-ca-{{ $org.Name | lower }}.{{ $.Values.ingress.parentDomain }}
+  - host: diamond-ca-{{ $org.Name | lower }}.{{ $.Values.ingress.parentDomain }}
     http:
       paths:
       - path: /
         backend: 
-          serviceName: hlf-ca--{{ $org.Name | lower }}
+          serviceName: diamond-ca--{{ $org.Name | lower }}
           servicePort: 7054
 {{- end }}
   tls:
   - hosts:
 {{- range $i, $org := .Values.PeerOrgs }}
-    - hlf-ca-{{ $org.Name | lower }}.{{ $.Values.ingress.parentDomain }}
+    - diamond-ca-{{ $org.Name | lower }}.{{ $.Values.ingress.parentDomain }}
 {{- end }}
-    secretName: hlf-ca--ingress-tls
+    secretName: diamond-ca--ingress-tls
 {{- end }} {{- /* if ingress.enabled */ -}}

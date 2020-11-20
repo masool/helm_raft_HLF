@@ -5,14 +5,14 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: hlf-orderer--{{ $org.Name | lower }}--{{ $host.Hostname | lower }}
+  name: diamond-orderer--{{ $org.Name | lower }}--{{ $host.Hostname | lower }}
 spec:
   replicas: {{ $.Values.orderer.replicas }}
   podManagementPolicy: Parallel
-  serviceName: hlf-orderer--{{ $org.Name | lower }}--{{ $host.Hostname | lower }}
+  serviceName: diamond-orderer--{{ $org.Name | lower }}--{{ $host.Hostname | lower }}
   selector:
     matchLabels:
-      app: hlf-orderer--{{ $org.Name | lower }}--{{ $host.Hostname | lower }}
+      app: diamond-orderer--{{ $org.Name | lower }}--{{ $host.Hostname | lower }}
   volumeClaimTemplates:
   {{- if $.Values.orderer.persistence.enabled }}
   - metadata:
@@ -28,9 +28,9 @@ spec:
   template:
     metadata:
       labels:
-        name: hlf-orderer
-        org: hlf-orderer--{{ $org.Name | lower }}
-        app: hlf-orderer--{{ $org.Name | lower }}--{{ $host.Hostname | lower }}
+        name: diamond-orderer
+        org: diamond-orderer--{{ $org.Name | lower }}
+        app: diamond-orderer--{{ $org.Name | lower }}--{{ $host.Hostname | lower }}
     spec:
       volumes:
         {{- if not $.Values.orderer.persistence.enabled }}
@@ -41,10 +41,10 @@ spec:
         emptyDir: {}
       - name: orderer-tls
         secret:
-          secretName: hlf-orderer--{{ $org.Name | lower }}--{{ $host.Hostname | lower }}-tls
+          secretName: diamond-orderer--{{ $org.Name | lower }}--{{ $host.Hostname | lower }}-tls
       - name: orderer-msp
         secret:
-          secretName: hlf-orderer--{{ $org.Name | lower }}--{{ $host.Hostname | lower }}-msp
+          secretName: diamond-orderer--{{ $org.Name | lower }}--{{ $host.Hostname | lower }}-msp
           items:
           - key: config.yaml
             path: config.yaml
@@ -58,7 +58,7 @@ spec:
             path: admincerts/cert.pem
       - name: genesis
         secret:
-          secretName: hlf-genesis.block
+          secretName: diamond-genesis.block
 
       {{- if $.Values.hostAliases }}
       hostAliases:
@@ -148,7 +148,7 @@ spec:
                 values:
                 {{- range $i, $hostInner := $org.Specs }}
                 {{- if not (eq $host.Hostname $hostInner.Hostname) }}
-                - hlf-orderer--{{ $org.Name | lower }}--{{ $hostInner.Hostname | lower }}
+                - diamond-orderer--{{ $org.Name | lower }}--{{ $hostInner.Hostname | lower }}
                 {{- end }} {{- /* if not same host */ -}}
                 {{- end }} {{- /* org.Specs */ -}}{{""}}
       {{- else }}
@@ -163,7 +163,7 @@ spec:
                   values:
                   {{- range $i, $hostInner := $org.Specs }}
                   {{- if not (eq $host.Hostname $hostInner.Hostname) }}
-                  - hlf-orderer--{{ $org.Name | lower }}--{{ $hostInner.Hostname | lower }}
+                  - diamond-orderer--{{ $org.Name | lower }}--{{ $hostInner.Hostname | lower }}
                   {{- end }} {{- /* if not same host */ -}}
                   {{- end }} {{- /* org.Specs */ -}}{{""}}
       {{- end }}{{- /* if-else antiAffinity.strict */ -}}

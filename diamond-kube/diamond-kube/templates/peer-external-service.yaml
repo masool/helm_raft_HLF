@@ -6,10 +6,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: hlf-peer-external--{{ $org.Name | lower }}--{{ $peer | lower }}
+  name: diamond-peer-external--{{ $org.Name | lower }}--{{ $peer | lower }}
   labels:
-    name: hlf-peer--{{ $org.Name | lower }}--{{ $peer | lower }}
-    component: hlf-peer
+    name: diamond-peer--{{ $org.Name | lower }}--{{ $peer | lower }}
+    component: diamond-peer
     fqdn: {{ $peer }}.{{ $org.Domain }}
     addToExternalHostAliases: "true"
   annotations:
@@ -20,8 +20,8 @@ metadata:
 spec:
   type: LoadBalancer
   selector:
-    name: hlf-peer
-    app: hlf-peer--{{ $org.Name | lower }}--{{ $peer | lower }}
+    name: diamond-peer
+    app: diamond-peer--{{ $org.Name | lower }}--{{ $peer | lower }}
   ports:
   - protocol: TCP
     port: 7051

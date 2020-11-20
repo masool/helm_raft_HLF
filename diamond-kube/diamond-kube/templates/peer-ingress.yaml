@@ -2,7 +2,7 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: hlf-peer--ingress
+  name: diamond-peer--ingress
   annotations:
     nginx.ingress.kubernetes.io/ssl-passthrough: "true"
     {{- range $key, $value := .Values.peer.ingress.annotations }}
@@ -18,7 +18,7 @@ spec:
       paths:
       - path: /
         backend: 
-          serviceName: hlf-peer--{{ $org.Name | lower }}--{{ $peer | lower }}
+          serviceName: diamond-peer--{{ $org.Name | lower }}--{{ $peer | lower }}
           servicePort: 7051
 {{- end }} {{- /* Peers */ -}}
 {{- end }} {{- /* Orgs */ -}}{{""}}

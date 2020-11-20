@@ -9,7 +9,7 @@ network:
 
   # defines which organizations will join to which channels
   channels:
-    - name: common
+    - name: dmdchannel
       # all peers in these organizations will join the channel
       orgs: [Diamond, Tenderer, Bidder, Printer]
     # - name: private-diamond-bidder
@@ -25,7 +25,7 @@ network:
       orgs: [Diamond, Tenderer, Bidder, Printer]
       # at which channels are we instantiating/upgrading chaincode?
       channels:
-      - name: common
+      - name: dmdchannel
         # chaincode will be instantiated/upgraded using the first peer in the first organization
         # chaincode will be invoked on all peers in these organizations
         orgs: [Diamond, Tenderer, Bidder, Printer]

@@ -21,8 +21,9 @@ sleep 2s
 ./collect_host_aliases.sh ./samples/scaled-raft-no-tls/
 
 helm upgrade diamond-kube ./diamond-kube -f samples/scaled-raft-no-tls/network.yaml -f samples/scaled-raft-no-tls/crypto-config.yaml -f samples/scaled-raft-no-tls/hostAliases.yaml --set orderer.cluster.enabled=true
-
-sleep 3m
+echo ""
+echo "Please wait for 2 min till all pods turn to running status.."
+sleep 2m
 echo ""
 echo "Waiting for approx 3 minutes to create channel"
 echo ""
