@@ -2,7 +2,7 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: diamond-orderer--ingress
+  name: hlf-orderer--ingress
   annotations:
     nginx.ingress.kubernetes.io/ssl-passthrough: "true"
     {{- range $key, $value := .Values.orderer.ingress.annotations }}
@@ -17,7 +17,7 @@ spec:
       paths:
       - path: /
         backend: 
-          serviceName: diamond-orderer--{{ $org.Name | lower }}--{{ $host.Hostname | lower }}
+          serviceName: hlf-orderer--{{ $org.Name | lower }}--{{ $host.Hostname | lower }}
           servicePort: 7050
 {{- end }} {{- /* org.Specs */ -}}
 {{- end }} {{- /* OrdererOrgs */ -}}{{""}}

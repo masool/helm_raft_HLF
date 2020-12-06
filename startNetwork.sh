@@ -6,7 +6,7 @@ echo ""
 echo "Please wait..."
 
 argo delete --all
-helm delete diamond-kube --purge
+helm delete diamond-kube
 
 echo ""
 
@@ -14,7 +14,7 @@ sleep 2s
 
 ./init.sh ./samples/scaled-raft-no-tls/ ./samples/chaincode/
 
-helm install ./diamond-kube --name diamond-kube -f samples/scaled-raft-no-tls/network.yaml -f samples/scaled-raft-no-tls/crypto-config.yaml --set orderer.cluster.enabled=true --set peer.launchPods=false --set orderer.launchPods=false
+helm install diamond-kube ./diamond-kube -f samples/scaled-raft-no-tls/network.yaml -f samples/scaled-raft-no-tls/crypto-config.yaml --set orderer.cluster.enabled=true --set peer.launchPods=false --set orderer.launchPods=false
 
 sleep 2s
 

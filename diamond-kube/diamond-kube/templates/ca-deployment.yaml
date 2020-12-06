@@ -3,21 +3,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: diamond-ca--{{ $org.Name | lower }}
+  name: hlf-ca--{{ $org.Name | lower }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: diamond-ca--{{ $org.Name | lower }}
+      app: hlf-ca--{{ $org.Name | lower }}
   template:
     metadata:
       labels:
-        app: diamond-ca--{{ $org.Name | lower }}
+        app: hlf-ca--{{ $org.Name | lower }}
     spec:
       volumes:
       - name: ca-tls
         secret:
-          secretName: diamond-ca--{{ $org.Name | lower }}-tls
+          secretName: hlf-ca--{{ $org.Name | lower }}-tls
 
       containers:
       - name: ca

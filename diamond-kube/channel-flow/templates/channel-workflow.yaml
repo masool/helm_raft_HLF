@@ -3,14 +3,14 @@
   {{- $_ := set $vars "ordererOrgName" $.Values.externalOrderer.orgName }}
   {{- $_ := set $vars "ordererUrl" (printf "%s.%s:%s" $.Values.externalOrderer.host $.Values.externalOrderer.domain $.Values.externalOrderer.port)  }}
   {{- $_ := set $vars "ordererHost" $.Values.externalOrderer.host }}
-  {{- $_ := set $vars "ordererTlsSecret"  (printf "diamond-orderer--%s-external-tlsca" ($vars.ordererOrgName | lower)) }}
+  {{- $_ := set $vars "ordererTlsSecret"  (printf "hlf-orderer--%s-external-tlsca" ($vars.ordererOrgName | lower)) }}
 {{- else }}
   {{- $ordererOrg := index .Values.OrdererOrgs 0 }}
-  {{- $ordererAddress := $.Values.useActualDomains | ternary (printf "%s.%s" (index $ordererOrg.Specs 0).Hostname $ordererOrg.Domain) (printf "diamond-orderer--%s--%s" ($ordererOrg.Name | lower) ((index $ordererOrg.Specs 0).Hostname | lower)) }} 
+  {{- $ordererAddress := $.Values.useActualDomains | ternary (printf "%s.%s" (index $ordererOrg.Specs 0).Hostname $ordererOrg.Domain) (printf "hlf-orderer--%s--%s" ($ordererOrg.Name | lower) ((index $ordererOrg.Specs 0).Hostname | lower)) }} 
   {{- $_ := set $vars "ordererOrgName" $ordererOrg.Name }}
   {{- $_ := set $vars "ordererUrl" (printf "%s:7050" $ordererAddress ) }}
   {{- $_ := set $vars "ordererHost" (index $ordererOrg.Specs 0).Hostname }}
-  {{- $_ := set $vars "ordererTlsSecret"  (printf "diamond-orderer--%s-tlsca" ($ordererOrg.Name | lower)) }}
+  {{- $_ := set $vars "ordererTlsSecret"  (printf "hlf-orderer--%s-tlsca" ($ordererOrg.Name | lower)) }}
 {{- end }}
 
 # useActualDomains: {{ $.Values.useActualDomains }}
@@ -23,8 +23,8 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Workflow
 metadata:
-  generateName: diamond-channels-
-  # name: diamond-channels-0
+  generateName: hlf-channels-
+  # name: hlf-channels-0
 spec:
   entrypoint: channels
 
@@ -38,13 +38,13 @@ spec:
   {{- end }}{{""}}
   
   volumes:
-  - name: diamond-scripts
+  - name: hlf-scripts
     configMap:
-      name: diamond-scripts
+      name: hlf-scripts
       defaultMode: 0777 # make scripts executable
-  - name: diamond-configtx
+  - name: hlf-configtx
     secret:
-      secretName: diamond-configtx.yaml
+      secretName: hlf-configtx.yaml
   - name: orderer-tlsca
     secret:
       secretName: {{ $vars.ordererTlsSecret }}
@@ -53,7 +53,7 @@ spec:
 
   - name: peer-{{ $org.Name | lower }}-admin-msp
     secret:
-      secretName: diamond-peer--{{ $org.Name | lower }}--admin-msp
+      secretName: hlf-peer--{{ $org.Name | lower }}--admin-msp
       items:
       - key: config.yaml
         path: config.yaml
@@ -70,7 +70,7 @@ spec:
 
   - name: peer-{{ $org.Name | lower }}-msp
     secret:
-      secretName: diamond-peer--{{ $org.Name | lower }}--msp
+      secretName: hlf-peer--{{ $org.Name | lower }}--msp
       items:
       - key: cacert.pem
         path: cacerts/ca.{{ $org.Domain}}-cert.pem
@@ -80,7 +80,7 @@ spec:
 
   - name: peer-{{ $org.Name | lower }}-{{ $peer | lower }}-tls
     secret:
-      secretName: diamond-peer--{{ $org.Name | lower }}--{{ $peer | lower }}-tls
+      secretName: hlf-peer--{{ $org.Name | lower }}--{{ $peer | lower }}-tls
 {{ end }} {{- /* Peers */ -}}
 {{ end }} {{- /* PeerOrgs */ -}}{{""}}
 
@@ -88,7 +88,7 @@ spec:
 {{- range $i, $org := .Values.ExternalPeerOrgs }}
   - name: peer-{{ $org.Name | lower }}-external-msp
     secret:
-      secretName: diamond-peer--{{ $org.Name | lower }}--external-msp
+      secretName: hlf-peer--{{ $org.Name | lower }}--external-msp
       items:
       - key: cacert.pem
         path: cacerts/ca.{{ $org.Domain}}-cert.pem
@@ -218,7 +218,7 @@ spec:
       source: |
           if peer channel checkexists --channelID {{ $channel.name }} -o {{ $vars.ordererUrl }} \
                 {{- if $.Values.tlsEnabled }}
-                    --tls --cafile /diamond_config/orderer-tlsca/tlscacert.pem \
+                    --tls --cafile /hlf_config/orderer-tlsca/tlscacert.pem \
                 {{- end }}
             ; then 
               echo '-- Channel {{ $channel.name }} already exists, exiting with 0' 
@@ -235,30 +235,30 @@ spec:
             echo '-- Channel {{ $channel.name }} does not exists, will create..' 
 
             mkdir -p /work && 
-            configtxgen -profile {{ $channel.name }} -channelID {{ $channel.name }} -configPath /diamond_config \
+            configtxgen -profile {{ $channel.name }} -channelID {{ $channel.name }} -configPath /hlf_config \
                   -outputCreateChannelTx /work/{{ $channel.name }}.tx && 
             
             peer channel create -o {{ $vars.ordererUrl }} -c {{ $channel.name }} -f /work/{{ $channel.name }}.tx \
                 {{- if $.Values.tlsEnabled }}
-                    --tls --cafile /diamond_config/orderer-tlsca/tlscacert.pem \
+                    --tls --cafile /hlf_config/orderer-tlsca/tlscacert.pem \
                 {{- end }}
 
       volumeMounts:
-        - mountPath: /diamond_config/orderer-tlsca
+        - mountPath: /hlf_config/orderer-tlsca
           name: orderer-tlsca
         - mountPath: /etc/hyperledger/fabric/msp/
           name: peer-{{ $org.Name | lower }}-admin-msp
-        - mountPath: /diamond_config/
-          name: diamond-configtx
+        - mountPath: /hlf_config/
+          name: hlf-configtx
 
         # peer org msp's required for configtxgen
         {{- range $i, $org := $.Values.PeerOrgs }}
-        - mountPath: /diamond_config/crypto-config/peerOrganizations/{{ $org.Domain }}/msp/
+        - mountPath: /hlf_config/crypto-config/peerOrganizations/{{ $org.Domain }}/msp/
           name: peer-{{ $org.Name | lower }}-msp
         {{- end }}
         # external peer org msp's required for configtxgen
         {{- range $i, $org := $.Values.ExternalPeerOrgs }}
-        - mountPath: /diamond_config/crypto-config/peerOrganizations/{{ $org.Domain }}/msp/
+        - mountPath: /hlf_config/crypto-config/peerOrganizations/{{ $org.Domain }}/msp/
           name: peer-{{ $org.Name | lower }}-external-msp
         {{- end }}
       
@@ -318,14 +318,14 @@ spec:
 
           peer channel fetch oldest /var/hyperledger/genesis.pb -c {{ $channel.name }} -o {{ $vars.ordererUrl }} \
               {{- if $.Values.tlsEnabled }}
-                  --tls --cafile /diamond_config/orderer-tlsca/tlscacert.pem \
+                  --tls --cafile /hlf_config/orderer-tlsca/tlscacert.pem \
               {{- end }}
           && echo '-- fetched genesis block for channel {{ $channel.name }}' && 
           
           peer channel join -b /var/hyperledger/genesis.pb
 
       volumeMounts:
-        - mountPath: /diamond_config/orderer-tlsca
+        - mountPath: /hlf_config/orderer-tlsca
           name: orderer-tlsca
         - mountPath: /etc/hyperledger/fabric/tls/
           name: peer-{{ $org.Name | lower }}-{{ $peer | lower }}-tls
@@ -338,7 +338,7 @@ spec:
               {{- if $.Values.useActualDomains }}
                 {{ $peer }}.{{ $org.Domain }}:7051
               {{- else }}
-                diamond-peer--{{ $org.Name | lower }}--{{ $peer | lower }}:7051
+                hlf-peer--{{ $org.Name | lower }}--{{ $peer | lower }}:7051
               {{- end }}
         - name: CORE_PEER_TLS_ENABLED
           value: {{ $.Values.tlsEnabled | quote }}
@@ -381,7 +381,7 @@ spec:
       source: |
           if peer channel checkanchors --channelID {{ $channel.name }} --orgID {{ $org.Name }}MSP -o {{ $vars.ordererUrl }} \
               {{- if $.Values.tlsEnabled }}
-                  --tls --cafile /diamond_config/orderer-tlsca/tlscacert.pem \
+                  --tls --cafile /hlf_config/orderer-tlsca/tlscacert.pem \
               {{- end }}
           ; then 
             echo '-- AnchorPeers are already configured for organization {{ $org.Name }}, exiting with 0' 
@@ -400,30 +400,30 @@ spec:
           mkdir -p /work && 
           peer channel fetch config /work/config_block.pb -c {{ $channel.name }} -o {{ $vars.ordererUrl }} \
               {{- if $.Values.tlsEnabled }}
-                  --tls --cafile /diamond_config/orderer-tlsca/tlscacert.pem \
+                  --tls --cafile /hlf_config/orderer-tlsca/tlscacert.pem \
               {{- end }}
           &&  echo '-- fetched config block' && 
           
           configtxlator proto_decode --input /work/config_block.pb --type common.Block | jq .data.data[0].payload.data.config > /work/config.json && 
           echo '-- trimmed envelope from config block and converted to json' && 
           
-          /diamond-scripts/attach_anchor_peers.sh {{ $org.Name }}MSP /diamond_config/configtx.yaml /work/config.json /work/updated_config.json && 
-          /diamond-scripts/prepare_config_update_block.sh {{ $channel.name }} /work/config.json /work/updated_config.json /work/update.pb && 
+          /hlf-scripts/attach_anchor_peers.sh {{ $org.Name }}MSP /hlf_config/configtx.yaml /work/config.json /work/updated_config.json && 
+          /hlf-scripts/prepare_config_update_block.sh {{ $channel.name }} /work/config.json /work/updated_config.json /work/update.pb && 
           
           peer channel update -f /work/update.pb -c {{ $channel.name }} -o {{ $vars.ordererUrl }} \
               {{- if $.Values.tlsEnabled }}
-                  --tls --cafile /diamond_config/orderer-tlsca/tlscacert.pem \
+                  --tls --cafile /hlf_config/orderer-tlsca/tlscacert.pem \
               {{- end }}
 
       volumeMounts:
-        - mountPath: /diamond_config/orderer-tlsca
+        - mountPath: /hlf_config/orderer-tlsca
           name: orderer-tlsca
         - mountPath: /etc/hyperledger/fabric/msp/
           name: peer-{{ $org.Name | lower }}-admin-msp
-        - mountPath: /diamond-scripts
-          name: diamond-scripts
-        - mountPath: /diamond_config/
-          name: diamond-configtx
+        - mountPath: /hlf-scripts
+          name: hlf-scripts
+        - mountPath: /hlf_config/
+          name: hlf-configtx
       
       env:
         - name: FABRIC_LOGGING_SPEC

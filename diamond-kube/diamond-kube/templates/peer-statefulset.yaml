@@ -2,19 +2,19 @@
 {{- range $i, $org := $.Values.PeerOrgs }}
 {{- range $peerIndex := until ($org.Template.Count | int) }}
 {{- $peer := (printf "peer%s" ($peerIndex | toString)) }}
-{{- $peerAddress := $.Values.useActualDomains | ternary (printf "%s.%s:7051" $peer $org.Domain) (printf "diamond-peer--%s--%s:7051" ($org.Name | lower) ($peer | lower)) }}
+{{- $peerAddress := $.Values.useActualDomains | ternary (printf "%s.%s:7051" $peer $org.Domain) (printf "hlf-peer--%s--%s:7051" ($org.Name | lower) ($peer | lower)) }}
 # peerAddress: {{ $peerAddress }}
 
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: diamond-peer--{{ $org.Name | lower }}--{{ $peer | lower }}
+  name: hlf-peer--{{ $org.Name | lower }}--{{ $peer | lower }}
 spec:
   replicas: 1
-  serviceName: diamond-peer--{{ $org.Name | lower }}--{{ $peer | lower }}
+  serviceName: hlf-peer--{{ $org.Name | lower }}--{{ $peer | lower }}
   selector:
     matchLabels:
-      app: diamond-peer--{{ $org.Name | lower }}--{{ $peer | lower }}
+      app: hlf-peer--{{ $org.Name | lower }}--{{ $peer | lower }}
   volumeClaimTemplates:
   {{- if $.Values.peer.persistence.enabled }}
   - metadata:
@@ -41,9 +41,9 @@ spec:
   template:
     metadata:
       labels:
-        name: diamond-peer 
-        org: diamond-peer--{{ $org.Name | lower }}
-        app: diamond-peer--{{ $org.Name | lower }}--{{ $peer | lower }}
+        name: hlf-peer 
+        org: hlf-peer--{{ $org.Name | lower }}
+        app: hlf-peer--{{ $org.Name | lower }}--{{ $peer | lower }}
     spec:
       volumes:
       {{- if not $.Values.peer.persistence.enabled }}
@@ -66,10 +66,10 @@ spec:
       {{- end }}
       - name: peer-tls
         secret:
-          secretName: diamond-peer--{{ $org.Name | lower }}--{{ $peer | lower }}-tls
+          secretName: hlf-peer--{{ $org.Name | lower }}--{{ $peer | lower }}-tls
       - name: peer-msp
         secret:
-          secretName: diamond-peer--{{ $org.Name | lower }}--{{ $peer | lower }}-msp
+          secretName: hlf-peer--{{ $org.Name | lower }}--{{ $peer | lower }}-msp
           items:
           - key: config.yaml
             path: config.yaml
@@ -85,7 +85,7 @@ spec:
             path: admincerts/cert.pem
       - name: peer-admin-msp
         secret:
-          secretName: diamond-peer--{{ $org.Name | lower }}--admin-msp
+          secretName: hlf-peer--{{ $org.Name | lower }}--admin-msp
           items:
           - key: config.yaml
             path: config.yaml
@@ -103,7 +103,7 @@ spec:
       {{- range $i, $chaincode := $.Values.network.chaincodes }}    
       - name: chaincode-{{ $chaincode.name | lower }}
         configMap:
-          name: diamond-chaincode--{{ $chaincode.name | lower }}
+          name: hlf-chaincode--{{ $chaincode.name | lower }}
       {{- end }}
 
       {{- if $.Values.hostAliases }}
@@ -198,7 +198,7 @@ spec:
                 {{- range $peerIndexInner := until ($org.Template.Count | int) }}
                 {{- if not (eq $peerIndex $peerIndexInner) }}
                 {{- $peerInner := (printf "peer%s" ($peerIndexInner | toString)) }}
-                - diamond-peer--{{ $org.Name | lower }}--{{ $peerInner | lower }}
+                - hlf-peer--{{ $org.Name | lower }}--{{ $peerInner | lower }}
                 {{- end }} {{- /* if not same peer */ -}}
                 {{- end }} {{- /* Peers */ -}}{{""}}
       {{- else }}
@@ -214,7 +214,7 @@ spec:
                   {{- range $peerIndexInner := until ($org.Template.Count | int) }}
                   {{- if not (eq $peerIndex $peerIndexInner) }}
                   {{- $peerInner := (printf "peer%s" ($peerIndexInner | toString)) }}
-                  - diamond-peer--{{ $org.Name | lower }}--{{ $peerInner | lower }}
+                  - hlf-peer--{{ $org.Name | lower }}--{{ $peerInner | lower }}
                   {{- end }} {{- /* if not same peer */ -}}
                   {{- end }} {{- /* Peers */ -}}{{""}}
       {{- end }}{{- /* if-else antiAffinity.strict */ -}}
@@ -242,7 +242,7 @@ spec:
         - mountPath: /etc/hyperledger/fabric/admin-msp/
           name: peer-admin-msp
         # - mountPath: /hl_config/channel/
-        #   name: diamond-channels
+        #   name: hlf-channels
         # chaincodes
         {{- range $i, $chaincode := $.Values.network.chaincodes }}    
         - mountPath: /chaincode/{{ $chaincode.name }}
@@ -263,7 +263,7 @@ spec:
           value: >- 
         {{- range $peerIndexInner := until ($org.Template.Count | int) }}
         {{- $peer := (printf "peer%s" ($peerIndexInner | toString)) }}
-        {{- $peerGossipAddress := $.Values.useActualDomains | ternary (printf "%s.%s:7051" $peer $org.Domain) (printf "diamond-peer--%s--%s:7051" ($org.Name | lower) ($peer | lower)) }}
+        {{- $peerGossipAddress := $.Values.useActualDomains | ternary (printf "%s.%s:7051" $peer $org.Domain) (printf "hlf-peer--%s--%s:7051" ($org.Name | lower) ($peer | lower)) }}
               {{ $peerGossipAddress }}
         {{- end }} {{- /* Peers */ -}}{{""}}
 

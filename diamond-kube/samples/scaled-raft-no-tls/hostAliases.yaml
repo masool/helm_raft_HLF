@@ -1,23 +1,23 @@
 hostAliases:
-- ip: 10.106.180.216
+- ip: 10.109.21.226
   hostnames: [orderer0.giggso.nl]
-- ip: 10.106.182.141
+- ip: 10.98.196.185
   hostnames: [orderer1.giggso.nl]
-- ip: 10.100.132.165
+- ip: 10.98.47.145
   hostnames: [orderer2.giggso.nl]
-- ip: 10.107.130.163
+- ip: 10.99.202.227
   hostnames: [peer0.bidder]
-- ip: 10.111.155.61
+- ip: 10.102.206.134
   hostnames: [peer1.bidder]
-- ip: 10.110.251.238
+- ip: 10.106.230.121
   hostnames: [peer0.diamond]
-- ip: 10.102.185.73
+- ip: 10.101.49.74
   hostnames: [peer1.diamond]
-- ip: 10.106.135.1
+- ip: 10.111.182.191
   hostnames: [peer0.printer]
-- ip: 10.97.40.216
+- ip: 10.110.230.101
   hostnames: [peer1.printer]
-- ip: 10.104.104.12
+- ip: 10.97.126.51
   hostnames: [peer0.tenderer]
-- ip: 10.106.252.135
+- ip: 10.107.227.211
   hostnames: [peer1.tenderer]

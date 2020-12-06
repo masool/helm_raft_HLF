@@ -55,7 +55,7 @@ peer:
     enabled: false
     annotations:
       # this should match the ingressClass when peer ingress controller is created
-      kubernetes.io/ingress.class: "diamond-peer"
+      kubernetes.io/ingress.class: "hlf-peer"
   externalService:
     # expose peers to outer world with LoadBalancer service type?
     enabled: false
@@ -104,7 +104,7 @@ orderer:
     enabled: false
     annotations:
       # this should match the ingressClass when orderer ingress controller is created
-      kubernetes.io/ingress.class: "diamond-orderer"
+      kubernetes.io/ingress.class: "hlf-orderer"
   externalService:
     # expose orderers to outer world with LoadBalancer service type?
     enabled: false
@@ -146,7 +146,7 @@ chaincode:
 
 
 # kafka settings
-diamond-kafka:
+hlf-kafka:
   # install kafka?
   enabled: false
 

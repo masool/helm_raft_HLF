@@ -1,6 +1,6 @@
 dependencies:
   - name: kafka
-    alias: diamond-kafka
+    alias: hlf-kafka
     repository: http://storage.googleapis.com/kubernetes-charts-incubator
     version: 0.20.8
-    condition: diamond-kafka.enabled
+    condition: hlf-kafka.enabled

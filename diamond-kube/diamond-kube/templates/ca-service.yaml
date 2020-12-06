@@ -3,13 +3,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: diamond-ca--{{ $org.Name | lower }}
+  name: hlf-ca--{{ $org.Name | lower }}
   labels:
-    name: diamond-ca--{{ $org.Name | lower }}
+    name: hlf-ca--{{ $org.Name | lower }}
 spec:
   type: ClusterIP
   selector:
-    app: diamond-ca--{{ $org.Name | lower }}
+    app: hlf-ca--{{ $org.Name | lower }}
   ports:
   - protocol: TCP
     port: 7054
